@@ -25,5 +25,12 @@ public class Main
         testHashTable3.add(83502431, new Student());
         testHashTable3.add(83502341, new Student());
         testHashTable3.add(83502342, new Student());
+        
+        testHashTable3.getValue(83502341);
+        testHashTable3.getValue(83502314);
+        
+        testHashTable3.printInfo();
+        testHashTable3.getValue(83502413);
+        testHashTable3.getValues(83502413);
     }
 }
