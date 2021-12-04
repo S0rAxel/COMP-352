@@ -1,5 +1,7 @@
 package CleverSIDC;
 
+import java.util.ArrayList; // Will not be used to construct the data structure itself.
+
 class CleverHashTable 
 {
 	int expectedSize; // The total number of elements the table expects to receive.
@@ -64,18 +66,21 @@ class CleverHashTable
 	}
 	
 	
-	void printLoad()
+	void printInfo()
 	{
 		System.out.println(String.format("The hash table currently contains %d items.", load));
+		System.out.println(String.format("Its first key is %s.", first.toString()));
+		System.out.println(String.format("Its last key is %s.\n", last.toString()));
 	}
 	
 	void add(int SIDC, Student value)
 	{
 		int hash = hash(SIDC);
+		Key newKey = null;
 		
 		if (table[hash] == null)
 		{
-			table[hash] = new Key(SIDC, value, hash);
+			table[hash] = newKey = new Key(SIDC, value, hash);
 		}
 		else if (table[hash] != null) // We have a collision.
 		{
@@ -85,7 +90,7 @@ class CleverHashTable
 				{
 					hash++;
 				}
-				table[hash] = new Key(SIDC, value, hash);
+				table[hash] = newKey = new Key(SIDC, value, hash); // The constructor will scan for the previous and next keys.
 			}
 			else // If the array is larger, resolve the collision through separate chaining.
 			{
@@ -97,8 +102,17 @@ class CleverHashTable
 					parentKey = parentKey.nextKey;
 					//System.out.println(String.format("Moving on to key #%d.\n", parentKey.key));
 				}
-				parentKey.setNext(new Key(SIDC, value, hash, true)); // Create a chained key.
+				parentKey.setNext(newKey = new Key(SIDC, value, hash, true)); // Create a chained key.
 			}
+		}
+		
+		if (newKey.prevKey == null) // If the new key has no previous neighbor,
+		{
+			this.first = newKey; // update the hashTable's 'first key' parameter.
+		}
+		if (newKey.nextKey == null) // If the new key has no following neighbor,
+		{
+			this.last = newKey; // update the hashTable's 'last key' parameter.
 		}
 		
 		load++;
@@ -179,17 +193,42 @@ class CleverHashTable
 				}
 			}
 			
-			System.out.println(String.format("Found taget key #%d, returning associated Student.\n", key));
+			System.out.println(String.format("Found taget key #%d. Returning associated Student.\n", key));
 			return targetKey.value;
 		}
 	}
 	
-	//
-	/*
-	Student getValues(int key)
+	// Return all values chained to the hash generated from the SIDC key.
+	ArrayList<Student> getValues(int key)
 	{
+		int hash = hash(key);
 		
+		if (table[hash] == null)
+		{
+			System.out.println(String.format("No entry found for SIDC key '%d', expected to be found at index %d.\n", key, hash));
+			return null;
+		}
+		
+		ArrayList<Student> studentsFound = new ArrayList<Student>();
+		
+		if (ceiledSize <= 1000) // If the table's small size means linear probing was used instead of chaining,
+		{
+			studentsFound.add(this.getValue(key)); // seek and return only the specific student.
+			return studentsFound;
+		}
+		else
+		{
+			Key targetKey = table[hash]; // Find the first item at index.
+			studentsFound.add(targetKey.value); // Beware, it will not be marked as 'chained'.
+			
+			while ((targetKey.nextKey != null) && (targetKey.nextKey.isChained = true)) // Collect chained elements.
+			{
+				studentsFound.add(targetKey.value);
+				targetKey = targetKey.nextKey;
+			}
+		}
+		System.out.println(String.format("%d chained keys were found at index %d. Returning associated Students.\n", studentsFound.size(), hash));
+		return studentsFound;
 	}
-	*/
 
 }
