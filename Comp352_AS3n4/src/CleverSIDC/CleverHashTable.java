@@ -150,5 +150,27 @@ class CleverHashTable
 		return hash;
 	}
 	
+	
+	// Return the specific item associated with the inputed SIDC key.
+	Student getValue(int key)
+	{
+		int hash = hash(key);
+		
+		if (table[hash] == null)
+		{
+			System.out.println(String.format("No entry found for SIDC key '%d', hashed at index %d.", key, hash));
+			return null;
+		}
+		else
+		{
+			Key targetKey = 
+		}
+	}
+	
+	//
+	Student getValues(int key)
+	{
+		
+	}
 
 }
