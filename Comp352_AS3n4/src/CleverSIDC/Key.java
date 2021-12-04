@@ -8,8 +8,9 @@ class Key
 	Student value;
 	
 	// Sequential information.	
-	Key nextKey;
-	Key prevKey;
+	Boolean isChained = false;
+	Key nextKey = null;
+	Key prevKey = null;
 	
 	
 	// Constructor
@@ -20,17 +21,34 @@ class Key
 		this.value = value;
 		
 		this.index = hash;
+		
+		System.out.println(String.format("Student #%d inserted at index %d.\n", key, hash));
+	}
+	
+	public Key (int key, Student value, int hash, boolean isChained)
+	{
+		this.key = key;
+		this.value = value;
+		
+		this.index = hash;
+		this.isChained = true;
+		
+		System.out.println(String.format("Student #%d inserted at index %d, chained.\n", key, hash));
 	}
 	
 	
-	// Getters & Setters
+	// Setters
 	
 	void setNext(Key newNext)
 	{
 		if (String.valueOf(key).length() == 8)
 		{
-			this.nextKey = newNext;
 			newNext.prevKey = this;
+			if (this.nextKey != null)
+			{
+				newNext.nextKey = this.nextKey.nextKey;
+			}
+			this.nextKey = newNext;
 		}
 		else
 		{
@@ -42,38 +60,13 @@ class Key
 	{
 		if (String.valueOf(key).length() == 8)
 		{
-			this.prevKey = newPrev;
+			newPrev.prevKey = this.prevKey;
 			newPrev.nextKey = this;
+			this.prevKey = newPrev;
 		}
 		else
 		{
 			System.out.println(String.format("The key in reference (%d) is not valid.", newPrev.toString()));
-		}
-	}
-	
-	Key getNext()
-	{
-		if (nextKey != null)
-		{
-			return nextKey;
-		}
-		else
-		{
-			System.out.println("No subsequent key exists.");
-			return null;
-		}
-	}
-	
-	Key getPrev()
-	{
-		if (prevKey != null)
-		{
-			return prevKey;
-		}
-		else
-		{
-			System.out.println("No previous key exists.");
-			return null;
 		}
 	}
 	

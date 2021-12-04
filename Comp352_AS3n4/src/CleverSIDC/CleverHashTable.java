@@ -21,16 +21,7 @@ class CleverHashTable
 	public CleverHashTable(int tableSize)
 	{
 		setSIDCThreshold(tableSize);
-		
-		System.out.println(String.format("\n\nTotal size of table: %d.\n", ceiledSize));
-		
-		
-		hash(99999999);
-		hash(11111111);
-		hash(55555555);
-		hash(55555556);
-		hash(55555565);
-		hash(55555655);
+		//System.out.println(String.format("Table initialized with length: %d.\n\n", table.length));
 	}
 	
 	
@@ -38,6 +29,15 @@ class CleverHashTable
 	void setSIDCThreshold(int size)
 	{
 		this.expectedSize = size;
+		
+		if (size < 900) // Hashes of three digits long.
+		{
+			ceiledSize = (int) (Math.ceil((size+100)/100) * 100);	
+			table = new Key[ceiledSize]; // Start with a table of 100+ elements.
+			
+			mappedDigits = 3;
+			return;
+		}
 		if (size < 9000) // Hashes of four digits long.
 		{
 			ceiledSize = (int) (Math.ceil((size+1000)/1000) * 1000);		
@@ -57,7 +57,7 @@ class CleverHashTable
 		else
 		{
 			ceiledSize = (int) (Math.ceil((size+100000)/100000) * 100000);	
-			table = new Key[100000]; // Start with a table of 100,000+ elements.
+			table = new Key[ceiledSize]; // Start with a table of 100,000+ elements.
 			
 			mappedDigits = 4;
 		}
@@ -66,37 +66,62 @@ class CleverHashTable
 	
 	
 	
-	void add(int key, Student value)
+	void add(int SIDC, Student value)
 	{
+		int hash = hash(SIDC);
 		
+		if (table[hash] == null)
+		{
+			table[hash] = new Key(SIDC, value, hash);
+			load++;
+			return;
+		}
+		else // We have a collision.
+		{
+			if (ceiledSize <= 1000) // If the table only has a capacity of a thousand or less, 
+			{
+				while(table[hash] != null) // resolve the collision through linear probing.
+				{
+					hash++;
+				}
+				table[hash] = new Key(SIDC, value, hash);
+				load++;
+				return;
+			}
+			else // If the array is larger, resolve the collision through separate chaining.
+			{
+				Key parentKey = table[hash];
+				//System.out.println(String.format("Parent key #%s at index %d.", parentKey.toString(), hash));
+				
+				while ((parentKey.nextKey != null) && (parentKey.nextKey.isChained = true)) // Find the last chained element.
+				{
+					parentKey = parentKey.nextKey;
+				}
+				parentKey.setNext(new Key(SIDC, value, hash, true)); // Create a chained key.
+				load++;
+				return;
+			}
+		}
 	}
-	
-	
-
 	
 	int hash(int SIDC)
 	{
+		int hash;
 		String SIDCAsString = String.valueOf(SIDC);
 		
-		System.out.println(String.format("SIDC: %d", SIDC));
+		//System.out.println(String.format("SIDC: %d", SIDC));
+		//System.out.println(String.format("Table size: %d", table.length));
 		
 		// Step 1: remap the SIDC down to a range determined by the array's size.
 		int base = (int) Math.pow(10, mappedDigits-1);
 		int newMax = base * Integer.parseInt(String.valueOf(ceiledSize).substring(0, 1));
-		
-		System.out.println(String.format("Using %d mapped digits.", mappedDigits));
-		System.out.println(String.format("Base: %d", base));
-		System.out.println(String.format("New max: %d", newMax));
-		
+
 		double ratio = Double.valueOf(newMax)/99999999.0;
 		int remapped = (int) (ratio * SIDC);
-		
-		System.out.println(String.format("Ratio: %f", ratio));
-		System.out.println(String.format("Remapped & rounded number: %d", remapped));
-		
+		//System.out.println(String.format("Remapped key: %d\n", (remapped)));
 		
 		// Step 2: compute the sum of all digits in the SIDC.
-		if ((remapped * 100 + 72) < ceiledSize) // Only perform if the result would remain within range.
+		if ((ceiledSize > 900) & ((remapped * 100 + 72) < ceiledSize)) // Only perform if the result would remain within range.
 		{
 			int SIDCSum = 0;
 			for (char digit : SIDCAsString.toCharArray())
@@ -104,16 +129,25 @@ class CleverHashTable
 				// The maximum value possible is 8 * 9 = 72.
 				SIDCSum += Character.getNumericValue(digit);
 			}
-			System.out.println(String.format("Sum of all digits in SIDC: %d", SIDCSum));
+			//System.out.println(String.format("SIDC sum: %d\n", (SIDCSum)));
 			
-			// Append and return the two computed values.
-			System.out.println(String.format("Final hash: %d\n", (remapped * 100 + SIDCSum - 1)));
-			return remapped * 100 + SIDCSum -1;
+			// Append the two computed values.
+			hash = remapped * 100 + SIDCSum;
+		}
+		else if (ceiledSize > 900) // Else, return the remapped value only.
+		{
+			hash = remapped * 100;
+		}
+		else // No need to multiply it if the array is less that a thousand entries long.
+		{
+			hash = remapped;
 		}
 		
-		// Else, return the remapped value only.
-		System.out.println(String.format("Final hash: %d\n", (remapped * 100 - 1)));
-		return remapped * 100 -1;
+		if (hash > 0) // If the result value is above zero,
+			hash--; // subtract one to fit it to the array's [0, ceiledSize-1] indexing range.
+		
+		//System.out.println(String.format("Final hash: %d\n", (hash)));
+		return hash;
 	}
 	
 
