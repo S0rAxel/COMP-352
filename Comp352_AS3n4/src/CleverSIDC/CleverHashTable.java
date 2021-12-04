@@ -57,6 +57,12 @@ class CleverHashTable
 		}
 	}
 	
+	
+	void printLoad()
+	{
+		System.out.println(String.format("The hash table currently contains %d items.", load));
+	}
+	
 	void add(int SIDC, Student value)
 	{
 		int hash = hash(SIDC);
@@ -64,10 +70,8 @@ class CleverHashTable
 		if (table[hash] == null)
 		{
 			table[hash] = new Key(SIDC, value, hash);
-			load++;
-			return;
 		}
-		else // We have a collision.
+		else if (table[hash] != null) // We have a collision.
 		{
 			if (ceiledSize <= 1000) // If the table only has a capacity of a thousand or less, 
 			{
@@ -76,8 +80,6 @@ class CleverHashTable
 					hash++;
 				}
 				table[hash] = new Key(SIDC, value, hash);
-				load++;
-				return;
 			}
 			else // If the array is larger, resolve the collision through separate chaining.
 			{
@@ -87,12 +89,14 @@ class CleverHashTable
 				while ((parentKey.nextKey != null) && (parentKey.nextKey.isChained = true)) // Find the last chained element.
 				{
 					parentKey = parentKey.nextKey;
+					//System.out.println(String.format("Moving on to key #%d.\n", parentKey.key));
 				}
 				parentKey.setNext(new Key(SIDC, value, hash, true)); // Create a chained key.
-				load++;
-				return;
 			}
 		}
+		
+		load++;
+		return;
 	}
 	
 	int hash(int SIDC)
@@ -149,21 +153,39 @@ class CleverHashTable
 		
 		if (table[hash] == null)
 		{
-			System.out.println(String.format("No entry found for SIDC key '%d', hashed at index %d.", key, hash));
+			System.out.println(String.format("No entry found for SIDC key '%d', expected to be found at index %d.\n", key, hash));
 			return null;
 		}
 		else
 		{
-			//Key targetKey = 
+			Key targetKey = table[hash]; // Find the first item at index.
+
+			while(!targetKey.equals(key)) // If it's not the right key, move on to the next item.
+			{
+				if (targetKey.nextKey != null)
+				{
+					targetKey = targetKey.nextKey;
+				}
+				else
+				{
+					System.out.println(String.format("No entry found for SIDC key '%d', expected to be found at index %d.\n", key, hash));
+					return null;
+				}
+			}
+			
+			System.out.println(String.format("Found taget key #%d, returning associated Student.\n", key));
+			return targetKey.value;
 		}
 
 		return new Student();
 	}
 	
 	//
+	/*
 	Student getValues(int key)
 	{
 		return new Student();
 	}
+	*/
 
 }

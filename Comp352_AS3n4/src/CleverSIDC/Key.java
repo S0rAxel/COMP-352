@@ -44,6 +44,7 @@ class Key
 			newNext.prevKey = this;
 			if (this.nextKey != null)
 			{
+				System.out.println(this.nextKey.nextKey);
 				newNext.nextKey = this.nextKey.nextKey;
 			}
 			this.nextKey = newNext;
@@ -79,6 +80,11 @@ class Key
 	public Boolean equals(Key otherKey)
 	{
 		return (key == otherKey.key);
+	}
+	
+	public Boolean equals(int otherKey)
+	{
+		return (key == otherKey);
 	}
 	
 	public int compareTo(Key otherKey)
