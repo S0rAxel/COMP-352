@@ -12,6 +12,17 @@ class Key
 	Key prevKey;
 	
 	
+	// Constructor
+	
+	public Key (int key, Student value, int hash)
+	{
+		this.key = key;
+		this.value = value;
+		
+		this.index = hash;
+	}
+	
+	
 	// Getters & Setters
 	
 	void setNext(Key newNext)
@@ -72,6 +83,11 @@ class Key
 	public String toString()
 	{
 		return String.valueOf(key);
+	}
+	
+	public Boolean equals(Key otherKey)
+	{
+		return (key == otherKey.key);
 	}
 	
 	public int compareTo(Key otherKey)
