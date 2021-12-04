@@ -12,7 +12,6 @@ class Key
 	Key nextKey = null;
 	Key prevKey = null;
 	
-	
 	// Constructor
 	
 	public Key (int key, Student value, int hash)
@@ -35,7 +34,6 @@ class Key
 		
 		System.out.println(String.format("Student #%d inserted at index %d, chained.\n", key, hash));
 	}
-	
 	
 	// Setters
 	

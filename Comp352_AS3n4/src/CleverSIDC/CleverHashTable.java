@@ -14,17 +14,11 @@ class CleverHashTable
 	Key first; // The first/leftmost key in the table.
 	Key last; // The last/rightmost key in the table.
 	
-	
-	
-	
-	
 	public CleverHashTable(int tableSize)
 	{
 		setSIDCThreshold(tableSize);
 		//System.out.println(String.format("Table initialized with length: %d.\n\n", table.length));
 	}
-	
-	
 	
 	void setSIDCThreshold(int size)
 	{
@@ -38,7 +32,7 @@ class CleverHashTable
 			mappedDigits = 3;
 			return;
 		}
-		if (size < 9000) // Hashes of four digits long.
+		else if (size < 9000) // Hashes of four digits long.
 		{
 			ceiledSize = (int) (Math.ceil((size+1000)/1000) * 1000);		
 			table = new Key[ceiledSize]; // Start with a table of 1,000+ elements.
@@ -46,7 +40,7 @@ class CleverHashTable
 			mappedDigits = 2;
 			return;
 		}
-		if (size < 90000) // Hashes of five digits long.
+		else if (size < 90000) // Hashes of five digits long.
 		{
 			ceiledSize = (int) (Math.ceil((size+10000)/10000) * 10000);	
 			table = new Key[ceiledSize]; // Start with a table of 10,000+ elements.
@@ -62,9 +56,6 @@ class CleverHashTable
 			mappedDigits = 4;
 		}
 	}
-	
-	
-	
 	
 	void add(int SIDC, Student value)
 	{
@@ -163,14 +154,16 @@ class CleverHashTable
 		}
 		else
 		{
-			Key targetKey = 
+			//Key targetKey = 
 		}
+
+		return new Student();
 	}
 	
 	//
 	Student getValues(int key)
 	{
-		
+		return new Student();
 	}
 
 }
