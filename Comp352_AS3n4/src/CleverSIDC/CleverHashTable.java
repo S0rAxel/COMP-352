@@ -85,7 +85,7 @@ class CleverHashTable
 		}
 		else if (table[hash].key < 0) // We have encountered a previously deleted key.
 		{
-			newKey = newKey = new Key(SIDC, value, hash);
+			newKey = new Key(SIDC, value, hash);
 			newKey.setPrev(table[hash].prevKey); // These functions handle both regular neighbors and chained keys.
 			newKey.setNext(table[hash].nextKey);
 			table[hash] = newKey;
