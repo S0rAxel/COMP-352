@@ -22,7 +22,7 @@ class Key
 		
 		this.index = hash;
 		
-		System.out.println(String.format("Student #%d inserted at index %d.\n", key, hash));
+		System.out.println(String.format("Student #%d inserted at index %d.", key, hash));
 	}
 	
 	public Key (int key, Student value, int hash, boolean isChained)
@@ -33,7 +33,7 @@ class Key
 		this.index = hash;
 		this.isChained = true;
 		
-		System.out.println(String.format("Student #%d inserted at index %d, chained.\n", key, hash));
+		System.out.println(String.format("Student #%d inserted at index %d, chained.", key, hash));
 	}
 	
 	
@@ -44,11 +44,7 @@ class Key
 		if (String.valueOf(key).length() == 8)
 		{
 			newNext.prevKey = this;
-			if (this.nextKey != null)
-			{
-				System.out.println(this.nextKey.nextKey);
-				newNext.nextKey = this.nextKey.nextKey;
-			}
+			newNext.nextKey = this.nextKey;
 			this.nextKey = newNext;
 		}
 		else
@@ -70,7 +66,7 @@ class Key
 			System.out.println(String.format("The key in reference (%d) is not valid.", newPrev.toString()));
 		}
 	}
-	
+
 	
 	// Overrides
 	

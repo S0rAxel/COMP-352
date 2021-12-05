@@ -4,7 +4,7 @@ public class Main
 {
     public static void main(String[] args) 
     {
-        System.out.println("Hello World!");
+        System.out.println("Hello World!\n");
         
         
         
@@ -16,15 +16,20 @@ public class Main
         CleverHashTable testHashTable4 = new CleverHashTable(9999);
         CleverHashTable testHashTable5 = new CleverHashTable(99999);
         
+        /*
         CleverHashTable testHashTable6 = new CleverHashTable(785);
         testHashTable6.add(55555555, new Student());
         testHashTable6.add(55555556, new Student());
+        */
         
-        testHashTable3.add(83502412, new Student());
+        testHashTable3.add(83502410, new Student());
         testHashTable3.add(83502413, new Student());
         testHashTable3.add(83502431, new Student());
         testHashTable3.add(83502341, new Student());
         testHashTable3.add(83502342, new Student());
+        testHashTable3.add(83502412, new Student());
+        testHashTable3.add(83502411, new Student());
+        testHashTable3.add(83502430, new Student());
         
         testHashTable3.getValue(83502341);
         testHashTable3.getValue(83502314);

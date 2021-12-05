@@ -81,6 +81,7 @@ class CleverHashTable
 		if (table[hash] == null)
 		{
 			table[hash] = newKey = new Key(SIDC, value, hash);
+			this.setUpPrevNext(newKey);
 		}
 		else if (table[hash] != null) // We have a collision.
 		{
@@ -91,6 +92,7 @@ class CleverHashTable
 					hash++;
 				}
 				table[hash] = newKey = new Key(SIDC, value, hash); // The constructor will scan for the previous and next keys.
+				this.setUpPrevNext(newKey);
 			}
 			else // If the array is larger, resolve the collision through separate chaining.
 			{
@@ -103,18 +105,12 @@ class CleverHashTable
 					//System.out.println(String.format("Moving on to key #%d.\n", parentKey.key));
 				}
 				parentKey.setNext(newKey = new Key(SIDC, value, hash, true)); // Create a chained key.
+				if ((parentKey.nextKey != this.last) && (newKey.nextKey == null)) // 
+				{
+					this.setUpNext(newKey);
+				}
 			}
 		}
-		
-		if (newKey.prevKey == null) // If the new key has no previous neighbor,
-		{
-			this.first = newKey; // update the hashTable's 'first key' parameter.
-		}
-		if (newKey.nextKey == null) // If the new key has no following neighbor,
-		{
-			this.last = newKey; // update the hashTable's 'last key' parameter.
-		}
-		
 		load++;
 		return;
 	}
@@ -163,6 +159,69 @@ class CleverHashTable
 		
 		//System.out.println(String.format("Final hash: %d\n", (hash)));
 		return hash;
+	}
+	
+	void setUpPrevNext(Key key)
+	{
+		// Traverse the array in search of a previous item.
+		for (int currentIndex = key.index - 1; currentIndex >= 0; currentIndex--)
+		{
+			if (table[currentIndex] != null) // When a first item is found, set and move on.
+			{
+				Key currentKey = table[currentIndex];
+				while ((currentKey.nextKey != null) && (currentKey.nextKey.isChained = true) && (currentKey.index == currentKey.nextKey.index))
+				{
+					currentKey = currentKey.nextKey; // Handle chained keys.
+				}
+				key.setPrev(currentKey);
+				break;
+			}
+			if (key.prevKey == null) // If no item was found, the key’s prev variable will have remained null.
+			{
+				this.first = key; // This means the key is the first item in the array.
+			}
+		}
+		
+		// Traverse the array in search of a subsequent item.
+		for (int currentIndex = key.index + 1; currentIndex < ceiledSize; currentIndex++)
+		{
+			if (table[currentIndex] != null) // When a first item is found, set and move on.
+			{
+				key.setNext(table[currentIndex]);
+				break;
+			}
+			if (key.nextKey == null) // If no item was found, the key’s next variable will have remained null.
+			{
+				this.last = key; // This means the key is the last item in the array.
+			}
+		}
+		
+		System.out.println(String.format("Student #%s (index %d) is preceded by student #%s (index %d), and followed by student #%s (index %d).\n", 
+				key.toString(), key.index, 
+				key.prevKey, (key.prevKey != null ? key.prevKey.index : -1),
+				key.nextKey, (key.nextKey != null ? key.nextKey.index : -1)));
+	}
+	
+	void setUpNext(Key key)
+	{
+		// Traverse the array in search of a subsequent item.
+		for (int currentIndex = key.index + 1; currentIndex < ceiledSize; currentIndex++)
+		{
+			if (table[currentIndex] != null) // When a first item is found, set and move on.
+			{
+				key.setNext(table[currentIndex]);
+				break;
+			}
+			if (key.nextKey == null) // If no item was found, the key’s next variable will have remained null.
+			{
+				this.last = key; // This means the key is the last item in the array.
+			}
+		}
+		
+		System.out.println(String.format("Student #%s (index %d) is preceded by student #%s (index %d), and followed by student #%s (index %d).\n", 
+				key.toString(), key.index, 
+				key.prevKey, (key.prevKey != null ? key.prevKey.index : -1),
+				key.nextKey, (key.nextKey != null ? key.nextKey.index : -1)));
 	}
 	
 	
