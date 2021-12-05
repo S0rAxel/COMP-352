@@ -30,6 +30,18 @@ public class Main
         testHashTable3.getValue(24352430);
         
         testHashTable3.getValues(24352430);
-
+        
+        
+        testHashTable3.remove(87654323);
+        testHashTable3.getValue(87654323);
+        testHashTable3.printInfo();
+        
+        
+        testHashTable3.remove(24352340);
+        testHashTable3.getValue(24352340);
+        testHashTable3.getValue(24352430);
+        testHashTable3.getValues(24352340);
+        
+        testHashTable3.printInfo();
     }
 }

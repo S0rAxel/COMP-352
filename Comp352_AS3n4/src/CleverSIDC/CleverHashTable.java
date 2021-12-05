@@ -250,24 +250,19 @@ class CleverHashTable
 		else
 		{
 			Key targetKey = table[hash]; // Find the first item at index.
-			
-			while(!targetKey.equals(SIDC)) // If it's not the right key, move on to the next item.
+			while(!targetKey.equals(SIDC) && (targetKey.nextKey != null)) // If it's not the right key, move on to the next item.
 			{
-				if ((!targetKey.equals(this.last)) && (targetKey.nextKey != null))
+				if (targetKey.equals(SIDC))
 				{
-					if (targetKey.equals(SIDC))
-					{
-						System.out.println("Found target key!.");
-						break;
-					}
-					else if (targetKey.equals(-SIDC)) // Again, if the deleted key is encountered, there is no need to continue on.
-					{
-						System.out.println(String.format("No entry found for SIDC key '%d', expected to be found at index %d.\n", SIDC, hash));
-						return null;
-					}
-					
-					targetKey = targetKey.nextKey;
+					System.out.println("Found target key!.");
+					break;
+				} // If the deleted key is encountered, there is no need to continue on.
+				else if (targetKey.equals(-SIDC) || (!targetKey.equals(this.last))) 
+				{
+					System.out.println(String.format("No entry found for SIDC key '%d', expected to be found at index %d.\n", SIDC, hash));
+					return null;
 				}
+				targetKey = targetKey.nextKey;
 			}
 			
 			System.out.println(String.format("Found taget key #%d. Returning associated Student.\n", SIDC));
@@ -328,7 +323,7 @@ class CleverHashTable
 		returnKey = table[hash];
 		while (!returnKey.equals(SIDC))
 		{
-			if ((returnKey.equals(-SIDC)) || (returnKey.equals(this.last)) || (returnKey.nex)) // If the key has already been deleted, or was never found.
+			if ((returnKey.equals(-SIDC)) || (returnKey.equals(this.last)) || (returnKey.nextKey == null)) // If the key has already been deleted, or was never found.
 			{
 				System.out.println(String.format("No key was found for SIDC code #%s. It may already have been deleted.", SIDC));
 				return null;
@@ -340,7 +335,10 @@ class CleverHashTable
 		if ((!returnKey.isChained) && (returnKey.nextKey.isChained) && (returnKey.index == returnKey.nextKey.index))
 		{
 			table[returnKey.index] = returnKey.nextKey;
-			table[returnKey.index].setPrev(returnKey.prevKey);
+			if (returnKey.prevKey != null)
+			{
+				table[returnKey.index].setPrev(returnKey.prevKey);
+			}
 			table[returnKey.index].isChained = false;
 			if (returnKey.equals(this.first)) // If the key was the first in the chain, update the hashTable’s first key parameter.
 			{
@@ -360,7 +358,7 @@ class CleverHashTable
 			}
 		}
 		
-		System.out.println(String.format("Key #%d has been removed from index %d.\n", -returnKey.key, returnKey.index));
+		System.out.println(String.format("Key #%d has been removed from index %d.\n", Math.abs(returnKey.key), returnKey.index));
 		this.load --;
 		return returnKey;
 	}
