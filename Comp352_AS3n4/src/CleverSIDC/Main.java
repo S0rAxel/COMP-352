@@ -19,6 +19,7 @@ public class Main
         
         testHashTable3.add(83502421, new Student());
         testHashTable3.add(83502142, new Student());
+        testHashTable3.add(83502400, new Student());
         
         testHashTable3.printInfo();
 
