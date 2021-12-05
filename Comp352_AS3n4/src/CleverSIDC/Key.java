@@ -15,25 +15,25 @@ class Key
 	
 	// Constructor
 	
-	public Key (int key, Student value, int hash)
+	public Key (int SIDC, Student value, int hash)
 	{
-		this.key = key;
+		this.key = SIDC;
 		this.value = value;
 		
 		this.index = hash;
 		
-		System.out.println(String.format("Student #%d inserted at index %d.", key, hash));
+		System.out.println(String.format("Student #%d inserted at index %d.", SIDC, hash));
 	}
 	
-	public Key (int key, Student value, int hash, boolean isChained)
+	public Key (int SIDC, Student value, int hash, boolean isChained)
 	{
-		this.key = key;
+		this.key = SIDC;
 		this.value = value;
 		
 		this.index = hash;
 		this.isChained = true;
 		
-		System.out.println(String.format("Student #%d inserted at index %d, chained.", key, hash));
+		System.out.println(String.format("Student #%d inserted at index %d, chained.", SIDC, hash));
 	}
 	
 	
@@ -41,7 +41,7 @@ class Key
 	
 	void setNext(Key newNext)
 	{
-		if (String.valueOf(key).length() == 8)
+		if (String.valueOf(key).replace("-", "").length() == 8)
 		{
 			newNext.prevKey = this;
 			newNext.nextKey = this.nextKey;
@@ -56,7 +56,7 @@ class Key
 	
 	void setPrev(Key newPrev)
 	{
-		if (String.valueOf(key).length() == 8)
+		if (String.valueOf(key).replace("-", "").length() == 8)
 		{
 			newPrev.prevKey = this.prevKey;
 			newPrev.nextKey = this;

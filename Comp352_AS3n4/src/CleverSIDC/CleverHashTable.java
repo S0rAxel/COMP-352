@@ -40,7 +40,7 @@ class CleverHashTable
 			mappedDigits = 3;
 			return;
 		}
-		if (size < 9000) // Hashes of four digits long.
+		else if (size < 9000) // Hashes of four digits long.
 		{
 			ceiledSize = (int) (Math.ceil((size+1000)/1000) * 1000);		
 			table = new Key[ceiledSize]; // Start with a table of 1,000+ elements.
@@ -48,7 +48,7 @@ class CleverHashTable
 			mappedDigits = 2;
 			return;
 		}
-		if (size < 90000) // Hashes of five digits long.
+		else if (size < 90000) // Hashes of five digits long.
 		{
 			ceiledSize = (int) (Math.ceil((size+10000)/10000) * 10000);	
 			table = new Key[ceiledSize]; // Start with a table of 10,000+ elements.
@@ -83,7 +83,14 @@ class CleverHashTable
 			table[hash] = newKey = new Key(SIDC, value, hash);
 			this.setUpPrevNext(newKey);
 		}
-		else if (table[hash] != null) // We have a collision.
+		else if (table[hash].key < 0) // We have encountered a previously deleted key.
+		{
+			newKey = newKey = new Key(SIDC, value, hash);
+			newKey.setPrev(table[hash].prevKey); // These functions handle both regular neighbors and chained keys.
+			newKey.setNext(table[hash].nextKey);
+			table[hash] = newKey;
+		}
+		else // We have a collision.
 		{
 			if (ceiledSize <= 1000) // If the table only has a capacity of a thousand or less, 
 			{
@@ -161,7 +168,7 @@ class CleverHashTable
 		return hash;
 	}
 	
-	void setUpPrevNext(Key key)
+	void setUpPrevNext(Key key) // Allows for negative/deleted keys to keep existing in the chain.
 	{
 		// Traverse the array in search of a previous item.
 		for (int currentIndex = key.index - 1; currentIndex >= 0; currentIndex--)
@@ -202,7 +209,7 @@ class CleverHashTable
 				key.nextKey, (key.nextKey != null ? key.nextKey.index : -1)));
 	}
 	
-	void setUpNext(Key key)
+	void setUpNext(Key key)  // Allows for negative/deleted keys to keep existing in the chain.
 	{
 		// Traverse the array in search of a subsequent item.
 		for (int currentIndex = key.index + 1; currentIndex < ceiledSize; currentIndex++)
@@ -226,48 +233,53 @@ class CleverHashTable
 	
 	
 	// Return the specific item associated with the inputed SIDC key.
-	Student getValue(int key)
+	Student getValue(int SIDC)
 	{
-		int hash = hash(key);
+		int hash = hash(SIDC);
 		
-		if (table[hash] == null)
+		if ((table[hash] == null) || table[hash].key == -SIDC) // If the key corresponds to the negative value of the inputed SIDC, it has been deleted.
 		{
-			System.out.println(String.format("No entry found for SIDC key '%d', expected to be found at index %d.\n", key, hash));
+			System.out.println(String.format("No entry found for SIDC key '%d', expected to be found at index %d.\n", SIDC, hash));
 			return null;
 		}
 		else
 		{
 			Key targetKey = table[hash]; // Find the first item at index.
 			
-			while(!targetKey.equals(key)) // If it's not the right key, move on to the next item.
+			while(!targetKey.equals(SIDC)) // If it's not the right key, move on to the next item.
 			{
 				if (targetKey.nextKey != null)
 				{
 					targetKey = targetKey.nextKey;
-					if (targetKey.equals(key))
+					if (targetKey.equals(SIDC))
 						break;
+					if (targetKey.equals(-SIDC)) // Again, if the deleted key is encountered, there is no need to continue on.
+					{
+						System.out.println(String.format("No entry found for SIDC key '%d', expected to be found at index %d.\n", SIDC, hash));
+						return null;
+					}
 				}
 				else
 				{
-					System.out.println(String.format("No entry found for SIDC key '%d', expected to be found at index %d.\n", key, hash));
+					System.out.println(String.format("No entry found for SIDC key '%d', expected to be found at index %d.\n", SIDC, hash));
 					return null;
 				}
 			}
 			
-			System.out.println(String.format("Found taget key #%d. Returning associated Student.\n", key));
+			System.out.println(String.format("Found taget key #%d. Returning associated Student.\n", SIDC));
 			//targetKey.printPrevNext();
 			return targetKey.value;
 		}
 	}
 	
 	// Return all values chained to the hash generated from the SIDC key.
-	ArrayList<Student> getValues(int key)
+	ArrayList<Student> getValues(int SIDC) // ADD HANDLING OF NEGATIVE/DELETED KEYS
 	{
-		int hash = hash(key);
+		int hash = hash(SIDC);
 		
 		if (table[hash] == null)
 		{
-			System.out.println(String.format("No entry found for SIDC key '%d', expected to be found at index %d.\n", key, hash));
+			System.out.println(String.format("No entry found for SIDC key '%d', expected to be found at index %d.\n", SIDC, hash));
 			return null;
 		}
 		
@@ -275,7 +287,7 @@ class CleverHashTable
 		
 		if (ceiledSize <= 1000) // If the table's small size means linear probing was used instead of chaining,
 		{
-			studentsFound.add(this.getValue(key)); // seek and return only the specific student.
+			studentsFound.add(this.getValue(SIDC)); // seek and return only the specific student.
 			return studentsFound;
 		}
 		else
@@ -285,7 +297,10 @@ class CleverHashTable
 			
 			while ((targetKey.nextKey != null) && (targetKey.nextKey.isChained = true) && (targetKey.nextKey.index == hash)) // Collect chained elements.
 			{
-				studentsFound.add(targetKey.value);
+				if (targetKey.key >= 0) // Only collect 'living'/nonegative keys.
+				{
+					studentsFound.add(targetKey.value);
+				}
 				targetKey = targetKey.nextKey;
 			}
 		}

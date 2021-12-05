@@ -16,10 +16,12 @@ public class Main
         testHashTable3.add(83502412, new Student());
         testHashTable3.printInfo();
         testHashTable3.add(83502411, new Student());
+        testHashTable3.add(13571232, new Student());
         
         testHashTable3.add(83502421, new Student());
         testHashTable3.add(83502142, new Student());
         testHashTable3.add(83502400, new Student());
+       
         
         testHashTable3.printInfo();
 
