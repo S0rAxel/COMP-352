@@ -94,33 +94,37 @@ class CleverHashTable
 		{
 			if (ceiledSize <= 1000) // If the table only has a capacity of a thousand or less, 
 			{
-				while(table[hash] != null) // resolve the collision through linear probing.
+				while((hash++ < ceiledSize) && (table[hash] != null)) // resolve the collision through linear probing.
 				{
 					hash++;
 				}
-				table[hash] = newKey = new Key(SIDC, value, hash); // The constructor will scan for the previous and next keys.
-				this.setUpPrevNext(newKey);
+				if (hash < ceiledSize) // If the current hash exceeds the table's capacity, continue on to the separate chaining section.
+				{
+					table[hash] = newKey = new Key(SIDC, value, hash);
+					this.setUpPrevNext(newKey);
+					load++;
+					return;
+				}
 			}
-			else // If the array is larger, resolve the collision through separate chaining.
+			
+			// If the array is larger, resolve the collision through separate chaining.
+			Key parentKey = table[hash];
+			while ((parentKey.nextKey != null) && (parentKey.index == parentKey.nextKey.index)) // Find the last chained element.
 			{
-				Key parentKey = table[hash];
-				while ((parentKey.nextKey != null) && (parentKey.index == parentKey.nextKey.index)) // Find the last chained element.
-				{
-					parentKey = parentKey.nextKey;
-				}
-				
-				newKey = new Key(SIDC, value, hash, true); // Create a chained key.
-				if (parentKey.equals(this.last)) // If the parent key was the last element in the array, update it.
-				{
-					this.last = newKey;
-				}
-				if (parentKey.nextKey != null) // If the parent key has a following key, update the relevant parameters.
-				{
-					newKey.setNext(parentKey.nextKey);
-					parentKey.setNext(newKey);
+				parentKey = parentKey.nextKey;
+			}
+			
+			newKey = new Key(SIDC, value, hash, true); // Create a chained key.
+			if (parentKey.equals(this.last)) // If the parent key was the last element in the array, update it.
+			{
+				this.last = newKey;
+			}
+			if (parentKey.nextKey != null) // If the parent key has a following key, update the relevant parameters.
+			{
+				newKey.setNext(parentKey.nextKey);
+				parentKey.setNext(newKey);
 
-					newKey.printPrevNext();
-				}
+				newKey.printPrevNext();
 			}
 		}
 		load++;
