@@ -104,17 +104,22 @@ class CleverHashTable
 			else // If the array is larger, resolve the collision through separate chaining.
 			{
 				Key parentKey = table[hash];
-				//System.out.println(String.format("Parent key #%s at index %d.", parentKey.toString(), hash));
-				
-				while ((parentKey.nextKey != null) && (parentKey.nextKey.isChained = true)) // Find the last chained element.
+				while ((parentKey.nextKey != null) && (parentKey.index == parentKey.nextKey.index)) // Find the last chained element.
 				{
 					parentKey = parentKey.nextKey;
-					//System.out.println(String.format("Moving on to key #%d.\n", parentKey.key));
 				}
-				parentKey.setNext(newKey = new Key(SIDC, value, hash, true)); // Create a chained key.
-				if ((parentKey.nextKey != this.last) && (newKey.nextKey == null)) // 
+				
+				newKey = new Key(SIDC, value, hash, true); // Create a chained key.
+				if (parentKey.equals(this.last)) // If the parent key was the last element in the array, update it.
 				{
-					this.setUpNext(newKey);
+					this.last = newKey;
+				}
+				if (parentKey.nextKey != null) // If the parent key has a following key, update the relevant parameters.
+				{
+					newKey.setNext(parentKey.nextKey);
+					parentKey.setNext(newKey);
+
+					newKey.printPrevNext();
 				}
 			}
 		}
@@ -219,10 +224,10 @@ class CleverHashTable
 				key.setNext(table[currentIndex]);
 				break;
 			}
-			if (key.nextKey == null) // If no item was found, the key’s next variable will have remained null.
-			{
-				this.last = key; // This means the key is the last item in the array.
-			}
+		}
+		if (key.nextKey == null) // If no item was found, the key’s next variable will have remained null.
+		{
+			this.last = key; // This means the key is the last item in the array.
 		}
 		
 		System.out.println(String.format("Student #%s (index %d) is preceded by student #%s (index %d), and followed by student #%s (index %d).\n", 
@@ -248,21 +253,20 @@ class CleverHashTable
 			
 			while(!targetKey.equals(SIDC)) // If it's not the right key, move on to the next item.
 			{
-				if (targetKey.nextKey != null)
+				if ((!targetKey.equals(this.last)) && (targetKey.nextKey != null))
 				{
-					targetKey = targetKey.nextKey;
 					if (targetKey.equals(SIDC))
+					{
+						System.out.println("Found target key!.");
 						break;
-					if (targetKey.equals(-SIDC)) // Again, if the deleted key is encountered, there is no need to continue on.
+					}
+					else if (targetKey.equals(-SIDC)) // Again, if the deleted key is encountered, there is no need to continue on.
 					{
 						System.out.println(String.format("No entry found for SIDC key '%d', expected to be found at index %d.\n", SIDC, hash));
 						return null;
 					}
-				}
-				else
-				{
-					System.out.println(String.format("No entry found for SIDC key '%d', expected to be found at index %d.\n", SIDC, hash));
-					return null;
+					
+					targetKey = targetKey.nextKey;
 				}
 			}
 			
@@ -295,7 +299,7 @@ class CleverHashTable
 			Key targetKey = table[hash]; // Find the first item at index.
 			studentsFound.add(targetKey.value); // Beware, it will not be marked as 'chained'.
 			
-			while ((targetKey.nextKey != null) && (targetKey.nextKey.isChained = true) && (targetKey.nextKey.index == hash)) // Collect chained elements.
+			while ((!targetKey.equals(this.last)) && (targetKey.nextKey != null) && (targetKey.nextKey.isChained = true) && (targetKey.nextKey.index == hash)) // Collect chained elements.
 			{
 				if (targetKey.key >= 0) // Only collect 'living'/nonegative keys.
 				{
@@ -307,5 +311,58 @@ class CleverHashTable
 		System.out.println(String.format("%d chained key(s) were/was found at index %d. Returning associated Student(s).\n", studentsFound.size(), hash));
 		return studentsFound;
 	}
-
+	
+	// 'Removes' the key corresponding to the given SIDC code by negating it. It will no longer be accessible to getValue(s) operations, but might remain part of the prev/next chain.
+	Key remove(int SIDC)
+	{
+		int hash = hash(SIDC);
+		Key returnKey;
+		
+		if (table[hash] == null) // Nothing was found at the hash index generated from the SIDC key.
+		{
+			System.out.println(String.format("No key was found for SIDC code #%s. It may already have been deleted.", SIDC));
+			return null;
+		}
+		
+		// Traverse the array in search of the relevant key.
+		returnKey = table[hash];
+		while (!returnKey.equals(SIDC))
+		{
+			if ((returnKey.equals(-SIDC)) || (returnKey.equals(this.last)) || (returnKey.nex)) // If the key has already been deleted, or was never found.
+			{
+				System.out.println(String.format("No key was found for SIDC code #%s. It may already have been deleted.", SIDC));
+				return null;
+			}
+			returnKey = returnKey.nextKey;
+		}
+		
+		// If the key to be deleted is the root of a chain, replaced it with the next in line.
+		if ((!returnKey.isChained) && (returnKey.nextKey.isChained) && (returnKey.index == returnKey.nextKey.index))
+		{
+			table[returnKey.index] = returnKey.nextKey;
+			table[returnKey.index].setPrev(returnKey.prevKey);
+			table[returnKey.index].isChained = false;
+			if (returnKey.equals(this.first)) // If the key was the first in the chain, update the hashTable’s first key parameter.
+			{
+				this.first = table[returnKey.index];
+			}
+		}
+		else // Else, simply ‘negate’ the key to mark it as deleted.
+		{
+			returnKey.key = -1 * returnKey.key;
+			if (returnKey.equals(this.first)) // If the key was the first in the chain, update the hashTable’s first key parameter.
+			{
+				this.first = returnKey.nextKey;
+			}
+			if (returnKey.equals(this.last)) // If the key was the last in the chain, update the hashTable’s last key parameter.
+			{
+				this.last = returnKey.prevKey;
+			}
+		}
+		
+		System.out.println(String.format("Key #%d has been removed from index %d.\n", -returnKey.key, returnKey.index));
+		this.load --;
+		return returnKey;
+	}
+	
 }
