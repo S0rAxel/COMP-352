@@ -45,6 +45,7 @@ class Key
 		{
 			newNext.prevKey = this;
 			newNext.nextKey = this.nextKey;
+			
 			this.nextKey = newNext;
 		}
 		else
@@ -59,6 +60,7 @@ class Key
 		{
 			newPrev.prevKey = this.prevKey;
 			newPrev.nextKey = this;
+			
 			this.prevKey = newPrev;
 		}
 		else
@@ -67,6 +69,16 @@ class Key
 		}
 	}
 
+	
+	// Misc
+	
+	void printPrevNext()
+	{
+		System.out.println(String.format("Student #%s (index %d) is preceded by student #%s (index %d), and followed by student #%s (index %d).\n", 
+				this.toString(), this.index, 
+				this.prevKey, (this.prevKey != null ? this.prevKey.index : -1),
+				this.nextKey, (this.nextKey != null ? this.nextKey.index : -1)));
+	}
 	
 	// Overrides
 	

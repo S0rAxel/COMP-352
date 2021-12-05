@@ -68,9 +68,9 @@ class CleverHashTable
 	
 	void printInfo()
 	{
-		System.out.println(String.format("The hash table currently contains %d items.", load));
-		System.out.println(String.format("Its first key is %s.", first.toString()));
-		System.out.println(String.format("Its last key is %s.\n", last.toString()));
+		System.out.println(String.format("The hash table has %d buckets in total and currently contains %d items.", ceiledSize, load));
+		System.out.println(String.format("Its first key is #%s at index %d.", first.toString(), first.index));
+		System.out.println(String.format("Its last key is #%s at index %d.\n", last.toString(), last.index));
 	}
 	
 	void add(int SIDC, Student value)
@@ -169,17 +169,17 @@ class CleverHashTable
 			if (table[currentIndex] != null) // When a first item is found, set and move on.
 			{
 				Key currentKey = table[currentIndex];
-				while ((currentKey.nextKey != null) && (currentKey.nextKey.isChained = true) && (currentKey.index == currentKey.nextKey.index))
+				while ((currentKey.nextKey != null) && (currentKey.nextKey.isChained = true) && (currentKey.index == currentKey.nextKey.index)) // If needed, handle chained keys.
 				{
-					currentKey = currentKey.nextKey; // Handle chained keys.
+					currentKey = currentKey.nextKey; 
 				}
 				key.setPrev(currentKey);
 				break;
 			}
-			if (key.prevKey == null) // If no item was found, the key’s prev variable will have remained null.
-			{
-				this.first = key; // This means the key is the first item in the array.
-			}
+		}
+		if (key.prevKey == null) // If no item was found, the key’s prev variable will have remained null.
+		{
+			this.first = key; // This means the key is the first item in the array.
 		}
 		
 		// Traverse the array in search of a subsequent item.
@@ -190,10 +190,10 @@ class CleverHashTable
 				key.setNext(table[currentIndex]);
 				break;
 			}
-			if (key.nextKey == null) // If no item was found, the key’s next variable will have remained null.
-			{
-				this.last = key; // This means the key is the last item in the array.
-			}
+		}
+		if (key.nextKey == null) // If no item was found, the key’s next variable will have remained null.
+		{
+			this.last = key; // This means the key is the last item in the array.
 		}
 		
 		System.out.println(String.format("Student #%s (index %d) is preceded by student #%s (index %d), and followed by student #%s (index %d).\n", 
@@ -238,12 +238,14 @@ class CleverHashTable
 		else
 		{
 			Key targetKey = table[hash]; // Find the first item at index.
-
+			
 			while(!targetKey.equals(key)) // If it's not the right key, move on to the next item.
 			{
 				if (targetKey.nextKey != null)
 				{
 					targetKey = targetKey.nextKey;
+					if (targetKey.equals(key))
+						break;
 				}
 				else
 				{
@@ -253,6 +255,7 @@ class CleverHashTable
 			}
 			
 			System.out.println(String.format("Found taget key #%d. Returning associated Student.\n", key));
+			//targetKey.printPrevNext();
 			return targetKey.value;
 		}
 	}
@@ -280,13 +283,13 @@ class CleverHashTable
 			Key targetKey = table[hash]; // Find the first item at index.
 			studentsFound.add(targetKey.value); // Beware, it will not be marked as 'chained'.
 			
-			while ((targetKey.nextKey != null) && (targetKey.nextKey.isChained = true)) // Collect chained elements.
+			while ((targetKey.nextKey != null) && (targetKey.nextKey.isChained = true) && (targetKey.nextKey.index == hash)) // Collect chained elements.
 			{
 				studentsFound.add(targetKey.value);
 				targetKey = targetKey.nextKey;
 			}
 		}
-		System.out.println(String.format("%d chained keys were found at index %d. Returning associated Students.\n", studentsFound.size(), hash));
+		System.out.println(String.format("%d chained key(s) were/was found at index %d. Returning associated Student(s).\n", studentsFound.size(), hash));
 		return studentsFound;
 	}
 
