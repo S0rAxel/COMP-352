@@ -14,39 +14,36 @@ class Key
 	
 	// Constructor
 	
-	public Key (int key, Student value, int hash)
+	public Key (int SIDC, Student value, int hash)
 	{
-		this.key = key;
+		this.key = SIDC;
 		this.value = value;
 		
 		this.index = hash;
 		
-		System.out.println(String.format("Student #%d inserted at index %d.\n", key, hash));
+		System.out.println(String.format("Student #%d inserted at index %d.", SIDC, hash));
 	}
 	
-	public Key (int key, Student value, int hash, boolean isChained)
+	public Key (int SIDC, Student value, int hash, boolean isChained)
 	{
-		this.key = key;
+		this.key = SIDC;
 		this.value = value;
 		
 		this.index = hash;
 		this.isChained = true;
 		
-		System.out.println(String.format("Student #%d inserted at index %d, chained.\n", key, hash));
+		System.out.println(String.format("Student #%d inserted at index %d, chained.", SIDC, hash));
 	}
 	
 	// Setters
 	
 	void setNext(Key newNext)
 	{
-		if (String.valueOf(key).length() == 8)
+		if (String.valueOf(key).replace("-", "").length() == 8)
 		{
 			newNext.prevKey = this;
-			if (this.nextKey != null)
-			{
-				System.out.println(this.nextKey.nextKey);
-				newNext.nextKey = this.nextKey.nextKey;
-			}
+			newNext.nextKey = this.nextKey;
+			
 			this.nextKey = newNext;
 		}
 		else
@@ -57,10 +54,11 @@ class Key
 	
 	void setPrev(Key newPrev)
 	{
-		if (String.valueOf(key).length() == 8)
+		if (String.valueOf(key).replace("-", "").length() == 8)
 		{
 			newPrev.prevKey = this.prevKey;
 			newPrev.nextKey = this;
+			
 			this.prevKey = newPrev;
 		}
 		else
@@ -68,7 +66,17 @@ class Key
 			System.out.println(String.format("The key in reference (%d) is not valid.", newPrev.toString()));
 		}
 	}
+
 	
+	// Misc
+	
+	void printPrevNext()
+	{
+		System.out.println(String.format("Student #%s (index %d) is preceded by student #%s (index %d), and followed by student #%s (index %d).\n", 
+				this.toString(), this.index, 
+				this.prevKey, (this.prevKey != null ? this.prevKey.index : -1),
+				this.nextKey, (this.nextKey != null ? this.nextKey.index : -1)));
+	}
 	
 	// Overrides
 	
