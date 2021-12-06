@@ -99,6 +99,7 @@ class CleverHashTable
         	}
         	currentKey = currentKey.prevKey;
         }
+        System.out.println("");
 	}
 	
 	
@@ -302,7 +303,6 @@ class CleverHashTable
 			{
 				if (targetKey.equals(SIDC))
 				{
-					System.out.println("Found target key!.");
 					break;
 				} // If the deleted key is encountered, there is no need to continue on.
 				else if (targetKey.equals(-SIDC) || (targetKey.equals(this.last))) 
@@ -380,17 +380,24 @@ class CleverHashTable
 		}
 		
 		// If the key to be deleted is the root of a chain, replaced it with the next in line.
-		if ((!returnKey.isChained) && (returnKey.nextKey.isChained) && (returnKey.index == returnKey.nextKey.index))
+		if ((!returnKey.isChained) && (returnKey.nextKey != null) && (returnKey.index == returnKey.nextKey.index))
 		{
-			table[returnKey.index] = returnKey.nextKey;
+			Key newHeadKey = returnKey.nextKey;
+			table[returnKey.index] = newHeadKey;
+
 			if (returnKey.prevKey != null)
 			{
-				table[returnKey.index].setPrev(returnKey.prevKey);
+				newHeadKey.setPrev(returnKey.prevKey);
 			}
-			table[returnKey.index].isChained = false;
+			else
+			{
+				newHeadKey.prevKey = null;
+			}
+			
+			newHeadKey.isChained = false;
 			if (returnKey.equals(this.first)) // If the key was the first in the chain, update the hashTable�s first key parameter.
 			{
-				this.first = table[returnKey.index];
+				this.first = newHeadKey;
 			}
 		}
 		else // Else, simply �negate� the key to mark it as deleted.
@@ -406,7 +413,7 @@ class CleverHashTable
 			}
 		}
 		
-		System.out.println(String.format("Key #%d has been removed from index %d.\n", (returnKey.key < 0? returnKey.key : -returnKey.key), returnKey.index));
+		System.out.println(String.format("Key #%d has been removed from index %d.\n", Math.abs(returnKey.key), returnKey.index));
 		this.load --;
 		return returnKey;
 	}
