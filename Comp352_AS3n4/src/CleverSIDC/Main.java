@@ -52,13 +52,14 @@ public class Main
         System.out.println("Generated " + generate(testHashTable3));
         System.out.println("Generated " + generate(testHashTable3) + "\n");
 
-        CleverHashTable testHashTable = new CleverHashTable(2445);
+        CleverHashTable testHashTable = new CleverHashTable(643);
 
         testHashTable.add(44352340, new Student());
         testHashTable.add(44352378, new Student());
         testHashTable.add(44352363, new Student());
-        //testHashTable.add(44352347, new Student());
-        //testHashTable.add(44352657, new Student());
+        testHashTable.add(44352657, new Student());
+        testHashTable.add(45357337, new Student());
+        testHashTable.add(44352347, new Student()); 
 
         /*testHashTable0.add(generate(testHashTable0), new Student());
         testHashTable0.add(generate(testHashTable0), new Student());
@@ -67,14 +68,26 @@ public class Main
         testHashTable0.add(generate(testHashTable0), new Student());
         testHashTable0.add(generate(testHashTable0), new Student());
         testHashTable0.add(generate(testHashTable0), new Student());*/
-        testHashTable.add(44352341, new Student());
 
         System.out.println("Range values with same values: " + testHashTable.rangeKey(44352340, 44352340) + "\n");
         System.out.println("Range values with wrong values: " + testHashTable.rangeKey(12345678, 23459456) + "\n");
-        System.out.println("\nRange values with correct values: " + testHashTable.rangeKey(44352340, 44352341) + "\n");
+        System.out.println("\nRange values with correct values: " + testHashTable.rangeKey(44352347, 44352340) + "\n");
 
+        System.out.println("\n\n -- AVL TESTING -- \n");
+
+        AVLTree tree = new AVLTree();
+
+        tree.root = tree.insert(tree.root, 10);
+        tree.root = tree.insert(tree.root, 20);
+        tree.root = tree.insert(tree.root, 30);
+        tree.root = tree.insert(tree.root, 40);
+        tree.root = tree.insert(tree.root, 100);
+        tree.root = tree.insert(tree.root, 50);
+        tree.root = tree.insert(tree.root, 25);
+
+        tree.inOrder(tree.root);
     }
-
+        
     // Creates the a new random 8 digit number that does not exist in the specified hashTable 
     public static int generate(CleverHashTable hashTable) 
     {

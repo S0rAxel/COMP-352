@@ -405,22 +405,28 @@ class CleverHashTable
 		Key k1 = table[hash1];
 		Key k2 = table[hash2];
 
-		Key kInBetween = k1;
-		while (kInBetween.nextKey != k2)
+		Key kInBetween = k1.nextKey;
+
+		while (kInBetween != k2)
 		{
 			if (kInBetween.key > 0)
 			{
 				range++;
 			}
+			
 			System.out.println("key : " + kInBetween);
-			System.out.println("key : " + kInBetween.nextKey);
+			System.out.println("next key : " + kInBetween.nextKey);
 
-
-			kInBetween = kInBetween.nextKey;
-
+			if	( kInBetween.nextKey != null)
+			{
+				kInBetween = kInBetween.nextKey;
+			}
+			else 
+			{
+				return 0;
+			}
 		}
 
 		return range;
 	}
-
 }
