@@ -19,15 +19,13 @@ class CleverHashTable
 	
 	
 	
-	
+	// Constructor and Set Up Method,
 	
 	public CleverHashTable(int tableSize)
 	{
 		setSIDCThreshold(tableSize);
 		//System.out.println(String.format("Table initialized with length: %d.\n\n", table.length));
 	}
-	
-	
 	
 	void setSIDCThreshold(int size)
 	{
@@ -67,12 +65,45 @@ class CleverHashTable
 	}
 	
 	
+	// Info methods.
+	
 	void printInfo()
 	{
 		System.out.println(String.format("The hash table has %d buckets in total and currently contains %d items.", ceiledSize, load));
 		System.out.println(String.format("Its first key is #%s at index %d.", first.toString(), first.index));
 		System.out.println(String.format("Its last key is #%s at index %d.\n", last.toString(), last.index));
 	}
+	
+	void printTraversals()
+	{
+		System.out.println("Traversing the keys from first to last...");
+        Key currentKey = this.first;
+        while (currentKey != null)
+        {
+        	if (currentKey.key >= 0)
+        	{
+        		System.out.println(String.format("Currently at key %s at index %d.", currentKey, currentKey.index));
+        		//currentKey.printPrevNext();
+        	}
+        	currentKey = currentKey.nextKey;
+        }
+        
+        System.out.println("\nTraversing the keys from last to first...");
+        currentKey = this.last;
+        while (currentKey != null)
+        {
+        	if (currentKey.key >= 0)
+        	{
+        		System.out.println(String.format("Currently at key %s at index %d.", currentKey, currentKey.index));
+        		//currentKey.printPrevNext();
+        	}
+        	currentKey = currentKey.prevKey;
+        }
+        System.out.println("");
+	}
+	
+	
+	// Meaty functions.
 	
 	void add(int SIDC, Student value)
 	{
@@ -101,8 +132,9 @@ class CleverHashTable
 				}
 				if (hash < ceiledSize) // If the current hash exceeds the table's capacity, continue on to the separate chaining section.
 				{
-					table[hash] = newKey = new Key(SIDC, value, hash);
+					newKey = new Key(SIDC, value, hash);
 					this.setUpPrevNext(newKey);
+					table[hash] = newKey;
 					load++;
 					return;
 				}
@@ -183,13 +215,18 @@ class CleverHashTable
 		// Traverse the array in search of a previous item.
 		for (int currentIndex = key.index - 1; currentIndex >= 0; currentIndex--)
 		{
-			if (table[currentIndex] != null) // When a first item is found, set and move on.
+			Key currentKey = table[currentIndex];
+			//System.out.println(String.format("Currently looking at cell %d.", currentIndex));
+			
+			if (currentKey != null) // When a first item is found, set and move on.
 			{
-				Key currentKey = table[currentIndex];
-				while ((currentKey.nextKey != null) && (currentKey.nextKey.isChained = true) && (currentKey.index == currentKey.nextKey.index)) // If needed, handle chained keys.
+				//System.out.println(String.format("It contains %s.", currentKey));
+				// If needed, handle chained keys.
+				while ((currentKey.nextKey != null) && (currentKey.nextKey.isChained = true) && (currentKey.index == currentKey.nextKey.index))
 				{
 					currentKey = currentKey.nextKey; 
 				}
+				
 				key.setPrev(currentKey);
 				break;
 			}
@@ -202,13 +239,17 @@ class CleverHashTable
 		// Traverse the array in search of a subsequent item.
 		for (int currentIndex = key.index + 1; currentIndex < ceiledSize; currentIndex++)
 		{
-			if (table[currentIndex] != null) // When a first item is found, set and move on.
+			Key currentKey = table[currentIndex];
+			//System.out.println(String.format("Currently looking at cell %d.", currentIndex));
+			
+			if (currentKey != null) // When a first item is found, set and move on.
 			{
-				key.setNext(table[currentIndex]);
+				//System.out.println(String.format("It contains %s.", currentKey));
+				key.setNext(currentKey);
 				break;
 			}
 		}
-		if (key.nextKey == null) // If no item was found, the key�s next variable will have remained null.
+		if (key.nextKey == null) // If no item was found, the key's next variable will have remained null.
 		{
 			this.last = key; // This means the key is the last item in the array.
 		}
@@ -224,8 +265,11 @@ class CleverHashTable
 		// Traverse the array in search of a subsequent item.
 		for (int currentIndex = key.index + 1; currentIndex < ceiledSize; currentIndex++)
 		{
+			System.out.println(String.format("Currently looking at cell %d.", currentIndex));
+					
 			if (table[currentIndex] != null) // When a first item is found, set and move on.
 			{
+				//System.out.println(String.format("It contains %s.", currentKey));
 				key.setNext(table[currentIndex]);
 				break;
 			}
@@ -259,10 +303,9 @@ class CleverHashTable
 			{
 				if (targetKey.equals(SIDC))
 				{
-					System.out.println("Found target key!.");
 					break;
 				} // If the deleted key is encountered, there is no need to continue on.
-				else if (targetKey.equals(-SIDC) || (!targetKey.equals(this.last))) 
+				else if (targetKey.equals(-SIDC) || (targetKey.equals(this.last))) 
 				{
 					System.out.println(String.format("No entry found for SIDC key '%d', expected to be found at index %d.\n", SIDC, hash));
 					return null;
@@ -337,17 +380,24 @@ class CleverHashTable
 		}
 		
 		// If the key to be deleted is the root of a chain, replaced it with the next in line.
-		if ((!returnKey.isChained) && (returnKey.nextKey.isChained) && (returnKey.index == returnKey.nextKey.index))
+		if ((!returnKey.isChained) && (returnKey.nextKey != null) && (returnKey.index == returnKey.nextKey.index))
 		{
-			table[returnKey.index] = returnKey.nextKey;
+			Key newHeadKey = returnKey.nextKey;
+			table[returnKey.index] = newHeadKey;
+
 			if (returnKey.prevKey != null)
 			{
-				table[returnKey.index].setPrev(returnKey.prevKey);
+				newHeadKey.setPrev(returnKey.prevKey);
 			}
-			table[returnKey.index].isChained = false;
+			else
+			{
+				newHeadKey.prevKey = null;
+			}
+			
+			newHeadKey.isChained = false;
 			if (returnKey.equals(this.first)) // If the key was the first in the chain, update the hashTable�s first key parameter.
 			{
-				this.first = table[returnKey.index];
+				this.first = newHeadKey;
 			}
 		}
 		else // Else, simply �negate� the key to mark it as deleted.

@@ -43,10 +43,15 @@ class Key
 	{
 		if (String.valueOf(key).replace("-", "").length() == 8)
 		{
-			newNext.prevKey = this;
-			newNext.nextKey = this.nextKey;
+			Key oldNextKey = this.nextKey;
 			
 			this.nextKey = newNext;
+			newNext.prevKey = this;
+
+			if (newNext.nextKey == null)
+			{
+				newNext.nextKey = oldNextKey;
+			}
 		}
 		else
 		{
@@ -58,10 +63,15 @@ class Key
 	{
 		if (String.valueOf(key).replace("-", "").length() == 8)
 		{
-			newPrev.prevKey = this.prevKey;
-			newPrev.nextKey = this;
+			Key oldPrevKey = this.prevKey;
 			
 			this.prevKey = newPrev;
+			newPrev.nextKey = this;
+			
+			if (newPrev.prevKey == null)
+			{
+				newPrev.prevKey = oldPrevKey;
+			}
 		}
 		else
 		{
