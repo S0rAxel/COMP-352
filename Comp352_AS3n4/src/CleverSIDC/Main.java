@@ -106,14 +106,14 @@ public class Main
         System.out.println("Generated " + generate(testHashTable3));
         System.out.println("Generated " + generate(testHashTable3) + "\n");
 
-        CleverHashTable testHashTable = new CleverHashTable(643);
+        CleverHashTable testHashTable = new CleverHashTable(632);
 
-        testHashTable.add(44352340, new Student());
         testHashTable.add(44352378, new Student());
-        testHashTable.add(44352363, new Student());
         testHashTable.add(44352657, new Student());
-        testHashTable.add(45357337, new Student());
+        testHashTable.add(44352340, new Student());
         testHashTable.add(44352347, new Student()); 
+        testHashTable.add(44352363, new Student());
+        testHashTable.add(45357337, new Student());
 
         /*testHashTable0.add(generate(testHashTable0), new Student());
         testHashTable0.add(generate(testHashTable0), new Student());
@@ -125,21 +125,14 @@ public class Main
 
         System.out.println("Range values with same values: " + testHashTable.rangeKey(44352340, 44352340) + "\n");
         System.out.println("Range values with wrong values: " + testHashTable.rangeKey(12345678, 23459456) + "\n");
-        System.out.println("\nRange values with correct values: " + testHashTable.rangeKey(44352347, 44352340) + "\n");
+        System.out.println("\nRange values with correct values: " + testHashTable.rangeKey(44352340, 44352347) + "\n");
 
-        System.out.println("\n\n -- AVL TESTING -- \n");
+        Sequence sequence = testHashTable.allKeys();
+        System.out.println("\nAll Keys: ");
+        for (Key key : sequence.keys) {
+            System.out.println("Student: " + key.key);
+        }
 
-        AVLTree tree = new AVLTree();
-
-        tree.root = tree.insert(tree.root, 10);
-        tree.root = tree.insert(tree.root, 20);
-        tree.root = tree.insert(tree.root, 30);
-        tree.root = tree.insert(tree.root, 40);
-        tree.root = tree.insert(tree.root, 100);
-        tree.root = tree.insert(tree.root, 50);
-        tree.root = tree.insert(tree.root, 25);
-
-        tree.inOrder(tree.root);
         testHashTable3.printTraversals();
     }
         

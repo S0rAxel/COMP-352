@@ -2,12 +2,12 @@ package CleverSIDC;
 
 public class Node 
 {
-    int key;
+    Key key;
     int height;
     Node left;
     Node right;
 
-    Node(int key)
+    Node(Key key)
     {
         this.key = key;
         height = 1;

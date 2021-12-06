@@ -3,6 +3,8 @@ package CleverSIDC;
 
 import java.util.ArrayList; // Will not be used to construct the data structure itself.
 
+import java.util.List;
+
 class CleverHashTable 
 {
 	int expectedSize; // The total number of elements the table expects to receive.
@@ -418,16 +420,34 @@ class CleverHashTable
 		return returnKey;
 	}
 	
-	/*List<key> allKeys()
+	Sequence allKeys()
 	{
-		List<Keys> keyList = new ArrayList();
-		Key key = first;
+		Sequence sequence = new Sequence();
+		AVLTree tree = new AVLTree(); // Data structure to sort automatically the keys as the go in
+		Key currentKey = this.first;
+		while (currentKey != null)
+        {
+        	if (currentKey.key >= 0)
+        	{
+        		System.out.println(String.format("Currently at key %s at index %d.", currentKey, currentKey.index));
+				tree.root = tree.insert(tree.root, currentKey);
+        	}
+        	currentKey = currentKey.nextKey;
+        }
 
-		while (key.nextKey != last)
+		List<Key> keys = new ArrayList<Key>();
+		tree.inOrder(keys, tree.root);
+
+		int i = 0;
+		for (Key key : keys) 
 		{
-
+			sequence.addAtRank(i, key);
+			System.out.println(String.format("key:" + key));
+			i++;
 		}
-	}*/
+
+		return sequence;
+	}
 
 	int rangeKey(int key1, int key2)
 	{
@@ -459,7 +479,7 @@ class CleverHashTable
 
 		while (kInBetween != k2)
 		{
-			if (kInBetween.key > 0)
+			if (kInBetween.key >= 0)
 			{
 				range++;
 			}
@@ -473,7 +493,7 @@ class CleverHashTable
 			}
 			else 
 			{
-				return 0;
+				return range;
 			}
 		}
 

@@ -1,6 +1,7 @@
 package CleverSIDC;
 
 import java.lang.Math;
+import java.util.List;
 
 public class AVLTree 
 {
@@ -87,27 +88,27 @@ public class AVLTree
         return node;
     }
 
-    Node rebalance(Node node, int key) 
+    Node rebalance(Node node, Key key) 
     {
          
         updateHeight(node);
         int balance = getBalance(node);
  
-        if (balance > 1 && key < node.left.key)
+        if (balance > 1 && key.key < node.left.key.key)
         {
             return rotateRight(node);
 
         }
-        else if (balance < -1 && key > node.right.key)
+        else if (balance < -1 && key.key > node.right.key.key)
         {
             return rotateLeft(node);
         }
-        else if (balance > 1 && key > node.left.key) 
+        else if (balance > 1 && key.key > node.left.key.key) 
         {
             node.left = rotateLeft(node.left);
             return rotateRight(node);
         }
-        else if (balance < -1 && key < node.right.key) 
+        else if (balance < -1 && key.key < node.right.key.key) 
         {
             node.right = rotateRight(node.right);
             return rotateLeft(node);
@@ -116,19 +117,19 @@ public class AVLTree
         return node;
     }
 
-    Node insert(Node node, int key)
+    Node insert(Node node, Key key)
     {
         if (node == null)
         {
             return new Node(key);
         }
 
-        if (key < node.key)
+        if (key.key < node.key.key)
         {
             node.left = insert(node.left, key);
             return rebalance(node, key);
         }
-        else if (key > node.key)
+        else if (key.key > node.key.key)
         {
             node.right = insert(node.right, key);
             return rebalance(node, key);
@@ -139,27 +140,16 @@ public class AVLTree
         }
     }
 
-    void inOrder(Node node)
+    void inOrder(List<Key> keys, Node node)
     {
         if (node == null)
         {
             return;
         }
 
-        inOrder(node.left);
-        System.out.print(node.key + " ");
-        inOrder(node.right);
-    }
-
-    void preOrder(Node node) {
-        if (node == null) 
-        {   
-            return;
-        }
- 
-        System.out.print(node.key + " ");
-        preOrder(node.left);
-        preOrder(node.right);
+        inOrder(keys, node.left);
+        keys.add(node.key);
+        inOrder(keys, node.right);
     }
 
     // Quick function to update the height of a node
